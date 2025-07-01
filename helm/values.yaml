@@ -1,0 +1,36 @@
+executor: airflow.providers.edge3.executors.EdgeExecutor
+
+defaultAirflowTag: 2.10.5
+defaultAirflowDigest: ~
+airflowVersion: 2.10.5
+exampleDag: true
+images:
+  airflow:
+    repository: airflow
+    tag: "2.10.5-edge"
+enableBuiltInSecretEnvVars:
+  AIRFLOW__CORE__FERNET_KEY: true
+  AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: true
+  AIRFLOW_CONN_AIRFLOW_DB: true
+  AIRFLOW__WEBSERVER__SECRET_KEY: true
+  AIRFLOW__API_AUTH__JWT_SECRET: true
+config:
+  core:
+    internal_api_secret_key: "MmEwYmQ1MWFlYWY4MjA2MGFhZGY0NzY5YmIyMjkzZGE"
+  webserver:
+    expose_config: 'True'
+  api:
+    auth_backends: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
+  edge:
+    api_enabled: 'True'
+    api_url: 'http://{{ include "airflow.fullname" . }}-webserver:8080/edge_worker/v1/rpcapi'
+    heartbeat_interval: 30
+    job_poll_interval: 5
+    push_logs_enabled: 'True'
+    worker_register_retry_attempts: 3
+    worker_register_retry_delay: 10
+dags:
+  mountPath: /opt/airflow/dags
+  persistence:
+    enabled: true
+    existingClaim: airflow-dags-claim
